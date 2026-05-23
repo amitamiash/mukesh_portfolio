@@ -1,890 +1,580 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mukesh Chand — Video Editor</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-:root{
-  --bg:#080c14;
-  --bg2:#0d1220;
-  --surface:#111827;
-  --surface2:#1a2332;
-  --border:rgba(255,255,255,0.07);
-  --border2:rgba(255,255,255,0.12);
-  --text:#e8eaf0;
-  --text2:#8892a4;
-  --text3:#555f73;
-  --cyan:#00d4ff;
-  --green:#00ff9d;
-  --orange:#ff6b35;
-  --gold:#ffc947;
-  --purple:#a855f7;
-  --red:#ff4757;
-  --display:'Bebas Neue',sans-serif;
-  --body:'Outfit',sans-serif;
-  --mono:'JetBrains Mono',monospace;
-}
-
-html{scroll-behavior:smooth}
-
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--body);
-  cursor:none;
-  overflow-x:hidden;
-  line-height:1.6;
-}
-
-a, button, .btn, .nav-links a, #top-btn, .contact-link, .folder-btn {
-  cursor:pointer !important;
-  pointer-events:all !important;
-}
-
-/* cursor */
-#cursor{
-  position:fixed;width:12px;height:12px;
-  background:var(--cyan);border-radius:50%;
-  pointer-events:none;z-index:99999;
-  transition:transform 0.15s ease;
-  mix-blend-mode:difference;
-}
-#cursor-ring{
-  position:fixed;width:40px;height:40px;
-  border:1px solid rgba(0,212,255,0.4);border-radius:50%;
-  pointer-events:none;z-index:99998;
-  transition:all 0.12s ease;
-}
-body:has(a:hover) #cursor,
-body:has(button:hover) #cursor,
-body:has(.featured-slide:hover) #cursor{transform:scale(3)}
-
-#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
-
-#progress{
-  position:fixed;top:0;left:0;height:3px;
-  background:linear-gradient(90deg,var(--cyan),var(--green));
-  z-index:9998;width:0%;transition:width 0.1s linear;
-}
-
-/* nav */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:1000;
-  padding:20px 60px;
-  display:flex;justify-content:space-between;align-items:center;
-  background:rgba(8,12,20,0);
-  transition:background 0.4s,backdrop-filter 0.4s,border-color 0.4s;
-  border-bottom:1px solid transparent;
-}
-nav.scrolled{
-  background:rgba(8,12,20,0.85);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-}
-.nav-logo{
-  font-family:var(--display);
-  font-size:22px;
-  letter-spacing:3px;
-  background:linear-gradient(135deg,var(--cyan),var(--green));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.nav-links{display:flex;gap:32px;list-style:none}
-.nav-links a{
-  font-family:var(--mono);font-size:12px;
-  letter-spacing:0.1em;color:var(--text2);
-  text-decoration:none;position:relative;
-  transition:color 0.2s;
-}
-.nav-links a::after{
-  content:'';position:absolute;bottom:-4px;left:0;
-  width:0;height:1px;background:var(--cyan);
-  transition:width 0.3s;
-}
-.nav-links a:hover{color:var(--cyan)}
-.nav-links a:hover::after{width:100%}
-
-/* hero */
-#hero{
-  min-height:100vh;display:flex;align-items:center;
-  position:relative;z-index:1;overflow:hidden;
-  padding:0 60px;
-}
-.hero-grid-bg{
-  position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px);
-  background-size:60px 60px;
-  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%);
-}
-.hero-glow{
-  position:absolute;
-  width:700px;height:700px;
-  background:radial-gradient(circle,rgba(0,212,255,0.12) 0%,transparent 70%);
-  top:-100px;right:-100px;pointer-events:none;
-}
-.hero-glow2{
-  position:absolute;
-  width:500px;height:500px;
-  background:radial-gradient(circle,rgba(0,255,157,0.08) 0%,transparent 70%);
-  bottom:-50px;left:200px;pointer-events:none;
-}
-.hero-content{position:relative;z-index:2;max-width:900px}
-.hero-status{
-  display:inline-flex;align-items:center;gap:10px;
-  background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.2);
-  padding:8px 18px;border-radius:100px;
-  font-family:var(--mono);font-size:12px;color:var(--green);
-  margin-bottom:36px;
-}
-.status-dot{
-  width:8px;height:8px;background:var(--green);border-radius:50%;
-  animation:pulse-green 2s infinite;
-}
-@keyframes pulse-green{
-  0%,100%{box-shadow:0 0 0 0 rgba(0,255,157,0.4)}
-  50%{box-shadow:0 0 0 8px rgba(0,255,157,0)}
-}
-.hero-eyebrow{
-  font-family:var(--mono);font-size:13px;
-  color:var(--cyan);letter-spacing:0.2em;
-  margin-bottom:16px;
-  text-transform:uppercase;
-}
-.hero-name{
-  font-family:var(--display);
-  font-size:clamp(72px,10vw,150px);
-  line-height:0.92;
-  letter-spacing:2px;
-}
-.hero-name .line1{
-  background:linear-gradient(135deg,#ffffff 0%,rgba(255,255,255,0.7) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.hero-name .line2{
-  background:linear-gradient(135deg,var(--cyan) 0%,var(--green) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.hero-title{
-  font-size:18px;font-weight:400;color:var(--text2);
-  margin-top:20px;margin-bottom:32px;
-}
-.hero-title span{color:var(--cyan);font-weight:600}
-.hero-desc{
-  max-width:560px;font-size:16px;color:var(--text2);
-  line-height:1.75;margin-bottom:44px;
-}
-.hero-cta{display:flex;gap:16px;flex-wrap:wrap;}
-
-.btn{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:14px 30px;font-family:var(--body);font-weight:600;
-  font-size:14px;text-decoration:none;border-radius:6px;
-  transition:all 0.25s;cursor:pointer;border:none;
-  position:relative;overflow:hidden;
-}
-.btn-primary{
-  background:linear-gradient(135deg,var(--cyan),var(--green));
-  color:#000;
-}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,212,255,0.35)}
-.btn-secondary{
-  background:transparent;color:var(--text);
-  border:1px solid var(--border2);
-}
-.btn-secondary:hover{background:var(--surface);border-color:var(--cyan);color:var(--cyan);transform:translateY(-2px)}
-
-.hero-stats{
-  position:absolute;right:60px;top:50%;transform:translateY(-50%);
-  display:flex;flex-direction:column;gap:20px;z-index:2;
-}
-.hero-stat{
-  background:var(--surface);border:1px solid var(--border);
-  padding:20px 28px;border-radius:12px;text-align:center;
-}
-.hero-stat-num{
-  font-family:var(--display);font-size:40px;letter-spacing:1px;
-  background:linear-gradient(135deg,var(--cyan),var(--green));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.hero-stat-label{
-  font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;margin-top:4px;
-}
-
-/* scroll hint */
-.scroll-hint{
-  position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-  font-family:var(--mono);font-size:10px;color:var(--text3);
-  letter-spacing:0.15em;z-index:2;
-}
-.scroll-mouse{
-  width:22px;height:36px;border:1.5px solid var(--text3);
-  border-radius:20px;display:flex;justify-content:center;padding-top:6px;
-}
-.scroll-wheel{
-  width:3px;height:8px;background:var(--cyan);border-radius:3px;
-  animation:scroll-anim 2s infinite;
-}
-@keyframes scroll-anim{
-  0%{opacity:1;transform:translateY(-8px)}
-  100%{opacity:0;transform:translateY(8px)}
-}
-
-/* sections */
-section{
-  padding:100px 60px;
-  position:relative;z-index:1;
-}
-.section-header{margin-bottom:60px;}
-.section-eyebrow{
-  font-family:var(--mono);font-size:12px;
-  color:var(--cyan);letter-spacing:0.2em;
-  text-transform:uppercase;margin-bottom:12px;display:block;
-}
-.section-title{
-  font-family:var(--display);font-size:clamp(48px,7vw,80px);
-  letter-spacing:1px;margin-bottom:20px;color:var(--text);
-}
-.section-title .hl{
-  background:linear-gradient(135deg,var(--cyan),var(--green));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.section-desc{font-size:16px;color:var(--text2);max-width:600px;}
-
-/* featured slider */
-#featured{background:var(--surface)}
-.featured-slider{
-  position:relative;
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-.featured-track{
-  display:flex;
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  scroll-behavior:smooth;
-  gap:16px;
-  padding-bottom:12px;
-}
-.featured-track::-webkit-scrollbar{display:none}
-.featured-slide{
-  flex:0 0 min(80vw, 560px);
-  scroll-snap-align:center;
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:12px;
-  overflow:hidden;
-  position:relative;
-  cursor:pointer;
-  transition:border-color 0.25s, transform 0.25s, box-shadow 0.25s;
-}
-.featured-slide.is-active{
-  border-color:var(--cyan);
-  box-shadow:0 18px 40px rgba(0,212,255,0.25);
-  transform:translateY(-4px);
-}
-.slide-media{
-  position:relative;
-  width:100%;
-  aspect-ratio:16/9;
-  overflow:hidden;
-  background:#000;
-}
-.slide-media img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  filter:brightness(0.7);
-  transition:transform 0.3s, filter 0.3s;
-}
-.featured-slide:hover img{
-  transform:scale(1.05);
-  filter:brightness(0.55);
-}
-.slide-play-overlay{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.slide-play-overlay span{
-  width:64px;
-  height:64px;
-  border-radius:50%;
-  border:1px solid rgba(0,212,255,0.6);
-  background:rgba(0,212,255,0.12);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--cyan);
-  font-size:26px;
-  box-shadow:0 0 32px rgba(0,212,255,0.4);
-}
-.slide-meta{padding:18px 20px 20px;}
-.work-label{
-  font-family:var(--mono);font-size:10px;
-  color:var(--green);letter-spacing:0.1em;
-  text-transform:uppercase;margin-bottom:8px;
-}
-.work-title{
-  font-family:var(--display);font-size:22px;
-  letter-spacing:0.5px;color:var(--text);
-}
-.slider-nav{
-  width:40px;height:40px;border-radius:50%;
-  border:1px solid var(--border2);
-  background:rgba(15,23,42,0.9);
-  color:var(--text2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;cursor:pointer;transition:all 0.2s;
-}
-.slider-nav:hover{
-  border-color:var(--cyan);color:var(--cyan);
-  box-shadow:0 0 20px rgba(0,212,255,0.3);
-}
-.slider-nav:disabled{
-  opacity:0.3;cursor:default;box-shadow:none;
-}
-
-/* library / expertise / about / contact / footer (same as before, shortened) */
-#library{background:var(--bg)}
-.folder-list{display:flex;flex-direction:column;}
-.folder-item{
-  border-top:1px solid var(--border);padding:32px 0;
-  transition:opacity 0.2s;
-}
-.folder-item:last-child{border-bottom:1px solid var(--border)}
-.folder-item:hover{opacity:0.8}
-.folder-header{
-  display:flex;justify-content:space-between;align-items:center;
-  cursor:pointer;user-select:none;
-}
-.folder-info{
-  display:flex;gap:24px;align-items:center;flex:1;
-}
-.folder-num{
-  font-family:var(--mono);font-size:12px;color:var(--text3);
-  letter-spacing:0.1em;min-width:40px;
-}
-.folder-details h3{
-  font-family:var(--display);font-size:clamp(24px,3vw,40px);
-  letter-spacing:0.5px;color:var(--text);margin-bottom:4px;
-}
-.folder-details p{
-  font-family:var(--mono);font-size:11px;
-  color:var(--text3);letter-spacing:0.1em;
-}
-.folder-toggle{font-size:20px;transition:transform 0.3s;}
-.folder-item.open .folder-toggle{transform:rotate(180deg);color:var(--cyan)}
-.folder-body{overflow:hidden;max-height:0;transition:max-height 0.4s ease;padding-top:0;}
-.folder-item.open .folder-body{max-height:500px;padding-top:24px}
-.folder-content{padding-left:64px;}
-.folder-content p{
-  font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px;
-  max-width:600px;
-}
-.folder-btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:10px 18px;border-radius:4px;
-  background:transparent;border:1px solid rgba(0,212,255,0.3);
-  color:var(--cyan);font-size:12px;font-family:var(--mono);
-  text-transform:uppercase;letter-spacing:0.1em;
-  transition:all 0.2s;
-}
-.folder-btn:hover{
-  background:rgba(0,212,255,0.1);border-color:var(--cyan);
-  box-shadow:0 0 20px rgba(0,212,255,0.2);
-}
-
-#expertise{background:var(--surface)}
-.expertise-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;}
-.expertise-intro p{font-size:15px;color:var(--text2);line-height:1.7;}
-.expertise-list{display:flex;flex-direction:column;}
-.exp-item{
-  padding:16px 0;border-bottom:1px solid var(--border);
-  font-size:16px;color:var(--text2);
-}
-.exp-item:first-child{border-top:1px solid var(--border)}
-#about{background:var(--bg)}
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
-.about-visual{
-  position:sticky;top:120px;width:200px;height:200px;
-  background:var(--surface);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  border-radius:12px;font-family:var(--display);font-size:60px;color:var(--cyan);
-}
-.about-content p{
-  font-size:15px;color:var(--text2);line-height:1.8;margin-bottom:20px;
-}
-#contact{background:var(--surface);text-align:center}
-.contact-grid{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:2px;
-  max-width:600px;margin:0 auto;
-}
-.contact-link{
-  background:var(--bg);border:1px solid var(--border);
-  padding:32px 24px;text-decoration:none;
-  transition:all 0.3s;position:relative;overflow:hidden;
-}
-.contact-link:hover{border-color:var(--cyan);transform:translateY(-4px)}
-.contact-icon{font-size:32px;margin-bottom:12px;}
-.contact-label{
-  font-family:var(--mono);font-size:10px;
-  color:var(--text3);letter-spacing:0.1em;
-  text-transform:uppercase;margin-bottom:6px;
-}
-.contact-value{
-  font-size:14px;color:var(--text);font-weight:600;
-  word-break:break-all;
-}
-footer{
-  background:var(--surface);border-top:1px solid var(--border);
-  padding:40px 60px;display:flex;justify-content:space-between;align-items:center;
-  font-family:var(--mono);font-size:12px;color:var(--text3);
-}
-.footer-logo{
-  font-family:var(--display);font-size:18px;
-  letter-spacing:2px;
-  background:linear-gradient(135deg,var(--cyan),var(--green));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-
-/* back to top */
-#top-btn{
-  position:fixed;bottom:40px;right:40px;z-index:999;
-  width:50px;height:50px;border-radius:50%;
-  background:var(--surface);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--mono);color:var(--cyan);font-weight:600;
-  text-decoration:none;transition:all 0.3s;
-  opacity:0;visibility:hidden;transform:scale(0);
-}
-#top-btn.visible{opacity:1;visibility:visible;transform:scale(1)}
-#top-btn:hover{background:var(--cyan);color:var(--bg);border-color:var(--cyan)}
-
-/* responsive */
-@media(max-width:1024px){
-  .hero-stats{
-    position:static;transform:none;
-    flex-direction:row;margin-top:40px;
-    gap:12px;width:100%;
-  }
-  .hero-stat{flex:1}
-  .expertise-grid{grid-template-columns:1fr}
-  .about-grid{grid-template-columns:1fr;gap:40px}
-  .about-visual{position:static}
-  section{padding:80px 40px}
-  nav{padding:20px 40px}
-  #hero{padding:0 40px}
-}
-@media(max-width:768px){
-  .contact-grid{grid-template-columns:1fr}
-  section{padding:60px 24px}
-  nav{padding:16px 24px}
-  #hero{padding:0 24px}
-  footer{flex-direction:column;gap:16px;text-align:center;padding:32px 24px}
-}
-@media(prefers-reduced-motion:reduce){
-  *{animation:none !important;transition:none !important}
-}
-</style>
+  <meta charset="UTF-8" />
+  <title>Mukesh Chand — Commercial Video Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Primary fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" />
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
-<canvas id="particles"></canvas>
-<div id="progress"></div>
-
-<nav id="navbar">
-  <div class="nav-logo">MUKESH</div>
-  <ul class="nav-links">
-    <li><a href="#featured">Work</a></li>
-    <li><a href="#library">Archive</a></li>
-    <li><a href="#expertise">Skills</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
-
-<section id="hero">
+  <!-- Background layers -->
+  <canvas id="particles"></canvas>
   <div class="hero-grid-bg"></div>
-  <div class="hero-glow"></div>
-  <div class="hero-glow2"></div>
-  
-  <div class="hero-content">
-    <div class="hero-status">
-      <span class="status-dot"></span>
-      Available for Projects
-    </div>
-    <div class="hero-eyebrow">Video Editor & Commercial Specialist</div>
-    <h1 class="hero-name">
-      <span class="line1">MUKESH</span><br/>
-      <span class="line2">CHAND</span>
-    </h1>
-    <div class="hero-title">Editing for <span>Impact</span> · Pacing is Everything</div>
-    <p class="hero-desc">
-      Commercial edits, branded films, TV spots, and story-driven content. Precision cuts. Emotional timing. Broadcast-ready work for agencies, brands, and production teams.
-    </p>
-    <div class="hero-cta">
-      <button class="btn btn-primary" onclick="document.getElementById('featured').scrollIntoView({behavior:'smooth'})">
-        View Work
-      </button>
-      <button class="btn btn-secondary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
-        Get in Touch
-      </button>
-    </div>
-  </div>
-  
-  <div class="hero-stats">
-    <div class="hero-stat">
-      <div class="hero-stat-num"><span class="counter" data-target="50">0</span>+</div>
-      <div class="hero-stat-label">Commercial Edits</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num"><span class="counter" data-target="6">0</span></div>
-      <div class="hero-stat-label">Major Categories</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num"><span class="counter" data-target="100">0</span>%</div>
-      <div class="hero-stat-label">Professional</div>
-    </div>
-  </div>
-  
-  <div class="scroll-hint">
-    SCROLL TO EXPLORE
-    <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
-  </div>
-</section>
+  <div class="hero-glow hero-glow-1"></div>
+  <div class="hero-glow hero-glow-2"></div>
 
-<section id="featured">
-  <div class="section-header">
-    <span class="section-eyebrow">Selected</span>
-    <h2 class="section-title">Featured <span class="hl">Cuts</span></h2>
-    <p class="section-desc">Swipe or drag to explore. Click any slide to watch on YouTube.</p>
-  </div>
-  
-  <div class="featured-slider">
-    <button class="slider-nav prev">‹</button>
-    <div class="featured-track" id="featuredTrack">
-      <article class="featured-slide is-active" data-video-id="VGevruEIG6Y">
-        <div class="slide-media">
-          <img src="https://img.youtube.com/vi/VGevruEIG6Y/maxresdefault.jpg" alt="Rajkummar Rao | Nimulid Strong" loading="lazy">
-          <div class="slide-play-overlay"><span>▶</span></div>
-        </div>
-        <div class="slide-meta">
-          <div class="work-label">Pharmaceutical</div>
-          <div class="work-title">Nimulid Strong</div>
-        </div>
-      </article>
-      <article class="featured-slide" data-video-id="Y8041vw0J1E">
-        <div class="slide-media">
-          <img src="https://img.youtube.com/vi/Y8041vw0J1E/maxresdefault.jpg" alt="Gas-O-Fast Asli Jeera · Rakesh Bedi" loading="lazy">
-          <div class="slide-play-overlay"><span>▶</span></div>
-        </div>
-        <div class="slide-meta">
-          <div class="work-label">FMCG</div>
-          <div class="work-title">Gas-O-Fast Asli Jeera · Rakesh Bedi</div>
-        </div>
-      </article>
-      <article class="featured-slide" data-video-id="_Vl1heUKWRw">
-        <div class="slide-media">
-          <img src="https://img.youtube.com/vi/_Vl1heUKWRw/maxresdefault.jpg" alt="Gas-O-Fast Asli Jeera · Paresh Rawal" loading="lazy">
-          <div class="slide-play-overlay"><span>▶</span></div>
-        </div>
-        <div class="slide-meta">
-          <div class="work-label">FMCG</div>
-          <div class="work-title">Gas-O-Fast Asli Jeera · Paresh Rawal</div>
-        </div>
-      </article>
-      <article class="featured-slide" data-video-id="9TLL1fCK_pE">
-        <div class="slide-media">
-          <img src="https://img.youtube.com/vi/9TLL1fCK_pE/maxresdefault.jpg" alt="Women's Day 2026 · Prega News" loading="lazy">
-          <div class="slide-play-overlay"><span>▶</span></div>
-        </div>
-        <div class="slide-meta">
-          <div class="work-label">Healthcare</div>
-          <div class="work-title">Women's Day 2026 · Prega News</div>
-        </div>
-      </article>
-      <article class="featured-slide" data-video-id="IH69SURRogE">
-        <div class="slide-media">
-          <img src="https://img.youtube.com/vi/IH69SURRogE/maxresdefault.jpg" alt="Happy Father's Day Film" loading="lazy">
-          <div class="slide-play-overlay"><span>▶</span></div>
-        </div>
-        <div class="slide-meta">
-          <div class="work-label">Branded</div>
-          <div class="work-title">Happy Father's Day</div>
-        </div>
-      </article>
-      <article class="featured-slide" data-video-id="WyLTNIwRowU">
-        <div class="slide-media">
-          <img src="https://img.youtube.com/vi/WyLTNIwRowU/maxresdefault.jpg" alt="HealthOK Lo Jija Ji · Archana Puran Singh" loading="lazy">
-          <div class="slide-play-overlay"><span>▶</span></div>
-        </div>
-        <div class="slide-meta">
-          <div class="work-label">Healthcare</div>
-          <div class="work-title">HealthOK Lo Jija Ji</div>
-        </div>
-      </article>
-    </div>
-    <button class="slider-nav next">›</button>
-  </div>
-</section>
+  <!-- Scroll progress -->
+  <div id="scroll-bar"></div>
 
-<!-- library, expertise, about, contact, footer exactly as before -->
-<section id="library">
-  <div class="section-header">
-    <span class="section-eyebrow">Complete Work</span>
-    <h2 class="section-title">Editing <span class="hl">Archive</span></h2>
-    <p class="section-desc">Browse the full body of work organized by category.</p>
-  </div>
-  <div class="folder-list">
-    <div class="folder-item">
-      <div class="folder-header" onclick="toggleFolder(this)">
-        <div class="folder-info">
-          <span class="folder-num">01</span>
-          <div class="folder-details">
-            <h3>Automobile Ads</h3>
-            <p>Campaign edits for automotive brands</p>
+  <!-- NAVBAR -->
+  <header class="site-header" id="top">
+    <nav class="nav">
+      <a href="#hero" class="nav-logo">
+        <span class="nav-logo-mark">MC</span>
+        <span class="nav-logo-text">Mukesh Chand</span>
+      </a>
+
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span>
+      </button>
+
+      <ul class="nav-links">
+        <li><a href="#featured" data-nav-section>Work</a></li>
+        <li><a href="#archive" data-nav-section>Archive</a></li>
+        <li><a href="#skills" data-nav-section>Skills</a></li>
+        <li><a href="#about" data-nav-section>About</a></li>
+        <li><a href="#contact" data-nav-section>Contact</a></li>
+      </ul>
+
+      <a href="#contact" class="nav-cta">Hire Me</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <main>
+    <section id="hero" class="section hero">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="hero-eyebrow">Video Editor & Commercial Specialist</p>
+
+          <h1 class="hero-title">
+            Commercial Video Editor<br />
+            for <span class="gradient-text">Brands, Agencies</span><br />
+            & Story‑Driven Campaigns
+          </h1>
+
+          <p class="hero-subtitle">
+            I craft sharp, emotionally timed edits for commercials, branded films, FMCG campaigns,
+            automotive launches, fashion films, and social‑first content.
+          </p>
+
+          <div class="hero-cta-row">
+            <a href="#featured" class="btn btn-primary">
+              <i class="fa-solid fa-play"></i>
+              <span>View Work</span>
+            </a>
+            <a href="#contact" class="btn btn-ghost">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span>Hire Me</span>
+            </a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat-card reveal">
+              <span class="stat-number" data-counter="50">0</span>
+              <span class="stat-label">Commercial Edits</span>
+            </div>
+            <div class="stat-card reveal">
+              <span class="stat-number" data-counter="6">0</span>
+              <span class="stat-label">Major Categories</span>
+            </div>
+            <div class="stat-card reveal">
+              <span class="stat-number" data-counter="100">0</span>
+              <span class="stat-label">Professional Delivery</span>
+            </div>
           </div>
         </div>
-        <span class="folder-toggle">❱</span>
-      </div>
-      <div class="folder-body">
-        <div class="folder-content">
-          <p>High-energy automotive campaign edits — precision cuts, rhythm-driven sequences, and brand storytelling for automobile advertising.</p>
-          <a href="https://www.youtube.com/playlist?list=PLOOqlFe6t_LZRHhy38ISazMZo99Zq5MZt" target="_blank" class="folder-btn">📂 Open Playlist</a>
+
+        <div class="hero-reel reveal">
+          <div class="hero-reel-inner">
+            <img src="https://img.youtube.com/vi/VGevruEIG6Y/maxresdefault.jpg" alt="Showreel frame" loading="lazy" />
+            <button class="hero-reel-play" data-youtube="VGevruEIG6Y">
+              <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+          <p class="hero-reel-caption">Selected Campaign Reel · 45s Cut</p>
         </div>
       </div>
-    </div>
-    <!-- other folders unchanged ... -->
-  </div>
-</section>
 
-<section id="expertise">
-  <div class="expertise-grid">
-    <div class="expertise-intro">
-      <span class="section-eyebrow">Craft</span>
-      <h2 class="section-title">What I <span class="hl">Edit</span></h2>
-      <p>Versatile across formats. Precise in every category. Built for commercial delivery and audience impact.</p>
-    </div>
-    <ul class="expertise-list">
-      <li class="exp-item">Commercial Video Editing</li>
-      <li class="exp-item">TV Commercials</li>
-      <li class="exp-item">Automotive Campaign Edits</li>
-      <li class="exp-item">Food & Beverage Ads</li>
-      <li class="exp-item">Fashion Films</li>
-      <li class="exp-item">Customer Story Videos</li>
-      <li class="exp-item">Branded Content</li>
-      <li class="exp-item">Social Campaign Edits</li>
-      <li class="exp-item">Narrative Promo Cuts</li>
-    </ul>
-  </div>
-</section>
+      <div class="hero-scroll-hint">
+        <span>Scroll to explore</span>
+        <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+      </div>
+    </section>
 
-<section id="about">
-  <div class="about-grid">
-    <div class="about-visual">MC</div>
-    <div class="about-content">
-      <span class="section-eyebrow">About</span>
-      <h2 class="section-title">Mukesh <span class="hl">Chand</span></h2>
-      <p>I edit for impact. Whether it's a 30-second TVC, an automotive launch film, or a branded story built around a celebrity — the work is always shaped around pacing, emotional timing, and what the audience needs to feel.</p>
-      <p>With experience across pharmaceutical campaigns, FMCG commercials, automobile brands, fashion films, and social content, I bring editorial discipline and creative instinct to every project.</p>
-      <p>The edit is where the story is finalized. I take that responsibility seriously.</p>
-    </div>
-  </div>
-</section>
+    <!-- FEATURED WORK -->
+    <section id="featured" class="section section-padded">
+      <header class="section-header">
+        <p class="section-eyebrow">Selected Work</p>
+        <h2 class="section-title">Featured <span class="gradient-text">Cuts</span></h2>
+        <p class="section-description">
+          A selection of commercial edits for national brands, FMCG, automotive, fashion, and healthcare.
+        </p>
+      </header>
 
-<section id="contact">
-  <div class="section-header">
-    <span class="section-eyebrow">Get in Touch</span>
-    <h2 class="section-title">Let's Work <span class="hl">Together</span></h2>
-    <p class="section-desc">Available for commercial projects, agency briefs, and brand campaigns.</p>
-  </div>
-  <div class="contact-grid">
-    <a href="tel:+918447331655" class="contact-link">
-      <div class="contact-icon">📞</div>
-      <div class="contact-label">Phone</div>
-      <div class="contact-value">+91 84473 31655</div>
-    </a>
-    <a href="mailto:editormukesh2022@gmail.com" class="contact-link">
-      <div class="contact-icon">📧</div>
-      <div class="contact-label">Email</div>
-      <div class="contact-value">editormukesh2022@gmail.com</div>
-    </a>
-  </div>
-</section>
+      <div class="work-grid">
+        <article class="work-card reveal" data-youtube="VGevruEIG6Y">
+          <div class="work-thumb">
+            <img src="https://img.youtube.com/vi/VGevruEIG6Y/maxresdefault.jpg" alt="Nimulid Strong · Rajkummar Rao" loading="lazy" />
+            <div class="work-overlay">
+              <button class="work-play">
+                <i class="fa-solid fa-play"></i>
+              </button>
+            </div>
+          </div>
+          <div class="work-meta">
+            <span class="work-label">Pharmaceutical</span>
+            <h3 class="work-title">Nimulid Strong · National TVC</h3>
+            <p class="work-description">Performance‑driven pharmaceutical spot with tight pacing and clean brand messaging.</p>
+          </div>
+        </article>
 
-<footer>
-  <div class="footer-logo">MUKESH CHAND</div>
-  <div class="footer-copy">© 2025 · Professional Video Editor · Commercial Specialist</div>
-</footer>
+        <article class="work-card reveal" data-youtube="Y8041vw0J1E">
+          <div class="work-thumb">
+            <img src="https://img.youtube.com/vi/Y8041vw0J1E/maxresdefault.jpg" alt="Gas-O-Fast Asli Jeera · Rakesh Bedi" loading="lazy" />
+            <div class="work-overlay">
+              <button class="work-play">
+                <i class="fa-solid fa-play"></i>
+              </button>
+            </div>
+          </div>
+          <div class="work-meta">
+            <span class="work-label">FMCG</span>
+            <h3 class="work-title">Gas‑O‑Fast · Asli Jeera</h3>
+            <p class="work-description">Light‑hearted performance spot balancing humour with strong product recall.</p>
+          </div>
+        </article>
 
-<a href="#hero" id="top-btn">↑</a>
+        <article class="work-card reveal" data-youtube="_Vl1heUKWRw">
+          <div class="work-thumb">
+            <img src="https://img.youtube.com/vi/_Vl1heUKWRw/maxresdefault.jpg" alt="Gas-O-Fast Asli Jeera · Paresh Rawal" loading="lazy" />
+            <div class="work-overlay">
+              <button class="work-play">
+                <i class="fa-solid fa-play"></i>
+              </button>
+            </div>
+          </div>
+          <div class="work-meta">
+            <span class="work-label">FMCG</span>
+            <h3 class="work-title">Gas‑O‑Fast · Paresh Rawal</h3>
+            <p class="work-description">Celebrity‑led FMCG TVC focused on punchy timing and clean visual structure.</p>
+          </div>
+        </article>
 
-<script>
-// cursor, particles, scroll progress, counters, folder toggle, parallax, ripple – same as before
-const cursor = document.getElementById('cursor');
-const ring   = document.getElementById('cursor-ring');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{
-  mx=e.clientX; my=e.clientY;
-  cursor.style.left=(mx-6)+'px';
-  cursor.style.top=(my-6)+'px';
-});
-(function animRing(){
-  rx += (mx-rx-20)*0.12;
-  ry += (my-ry-20)*0.12;
-  ring.style.left=rx+'px';
-  ring.style.top=ry+'px';
-  requestAnimationFrame(animRing);
-})();
+        <article class="work-card reveal" data-youtube="9TLL1fCK_pE">
+          <div class="work-thumb">
+            <img src="https://img.youtube.com/vi/9TLL1fCK_pE/maxresdefault.jpg" alt="Prega News · Women's Day" loading="lazy" />
+            <div class="work-overlay">
+              <button class="work-play">
+                <i class="fa-solid fa-play"></i>
+              </button>
+            </div>
+          </div>
+          <div class="work-meta">
+            <span class="work-label">Healthcare</span>
+            <h3 class="work-title">Prega News · Women’s Day Film</h3>
+            <p class="work-description">Emotion‑first brand film built around real stories and subtle editorial rhythm.</p>
+          </div>
+        </article>
 
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-let W,H,particles=[];
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-resize();window.addEventListener('resize',resize);
-class Particle{
-  constructor(){this.reset()}
-  reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;this.alpha=Math.random()*0.5+0.1;this.r=Math.random()*1.5+0.5;this.color=Math.random()>0.5?'0,212,255':'0,255,157';}
-  update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();}
-  draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(${this.color},${this.alpha})`;ctx.fill();}
-}
-for(let i=0;i<120;i++)particles.push(new Particle());
-function connectParticles(){
-  for(let i=0;i<particles.length;i++){
-    for(let j=i+1;j<particles.length;j++){
-      const dx=particles[i].x-particles[j].x;
-      const dy=particles[i].y-particles[j].y;
-      const d=Math.sqrt(dx*dx+dy*dy);
-      if(d<120){
-        ctx.beginPath();
-        ctx.strokeStyle=`rgba(0,212,255,${0.06*(1-d/120)})`;
-        ctx.lineWidth=0.5;
-        ctx.moveTo(particles[i].x,particles[i].y);
-        ctx.lineTo(particles[j].x,particles[j].y);
-        ctx.stroke();
-      }
-    }
-  }
-}
-function animate(){
-  ctx.clearRect(0,0,W,H);
-  particles.forEach(p=>{p.update();p.draw()});
-  connectParticles();
-  requestAnimationFrame(animate);
-}
-animate();
+        <article class="work-card reveal" data-youtube="IH69SURRogE">
+          <div class="work-thumb">
+            <img src="https://img.youtube.com/vi/IH69SURRogE/maxresdefault.jpg" alt="Father's Day Film" loading="lazy" />
+            <div class="work-overlay">
+              <button class="work-play">
+                <i class="fa-solid fa-play"></i>
+              </button>
+            </div>
+          </div>
+          <div class="work-meta">
+            <span class="work-label">Branded Content</span>
+            <h3 class="work-title">Father’s Day · Brand Story</h3>
+            <p class="work-description">Sentimental brand piece focusing on pacing, emotion, and narrative clarity.</p>
+          </div>
+        </article>
 
-window.addEventListener('scroll',()=>{
-  const pct=(scrollY/(document.body.scrollHeight-innerHeight))*100;
-  document.getElementById('progress').style.width=pct+'%';
-  document.getElementById('navbar').classList.toggle('scrolled',scrollY>60);
-  document.getElementById('top-btn').classList.toggle('visible',scrollY>400);
-});
+        <article class="work-card reveal" data-youtube="WyLTNIwRowU">
+          <div class="work-thumb">
+            <img src="https://img.youtube.com/vi/WyLTNIwRowU/maxresdefault.jpg" alt="HealthOK Lo Jija Ji · Archana Puran Singh" loading="lazy" />
+            <div class="work-overlay">
+              <button class="work-play">
+                <i class="fa-solid fa-play"></i>
+              </button>
+            </div>
+          </div>
+          <div class="work-meta">
+            <span class="work-label">Healthcare</span>
+            <h3 class="work-title">HealthOK · Lo Jija Ji</h3>
+            <p class="work-description">Humorous health‑focused commercial with crisp cuts and strong dialogue rhythm.</p>
+          </div>
+        </article>
+      </div>
+    </section>
 
-const counterObs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      const counters=e.target.querySelectorAll('.counter');
-      counters.forEach(c=>{
-        const target=+c.dataset.target;
-        let cur=0;const step=target/40;
-        const t=setInterval(()=>{cur+=step;if(cur>=target){cur=target;clearInterval(t)}c.textContent=Math.floor(cur);},40);
-      });
-      counterObs.unobserve(e.target);
-    }
-  });
-},{threshold:0.5});
-const heroStats=document.querySelector('.hero-stats');
-if(heroStats)counterObs.observe(heroStats);
+    <!-- ARCHIVE -->
+    <section id="archive" class="section section-padded">
+      <header class="section-header">
+        <p class="section-eyebrow">Full Library</p>
+        <h2 class="section-title">Editing <span class="gradient-text">Archive</span></h2>
+        <p class="section-description">
+          Complete body of work sorted by category — from automotive launches to FMCG and fashion campaigns.
+        </p>
+      </header>
 
-function toggleFolder(header){
-  const item=header.closest('.folder-item');
-  item.classList.toggle('open');
-}
+      <div class="archive-list">
+        <article class="archive-item reveal">
+          <button class="archive-header" onclick="toggleFolder(this)">
+            <div class="archive-info">
+              <span class="archive-index">01</span>
+              <div>
+                <h3 class="archive-title">Automobile Ads</h3>
+                <p class="archive-subtitle">Campaign edits for automotive brands</p>
+              </div>
+            </div>
+            <span class="archive-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+          </button>
+          <div class="archive-body">
+            <p class="archive-text">
+              High‑energy automotive campaign edits — motion‑driven pacing, sound‑synced beats, and product‑first framing.
+            </p>
+            <a href="https://www.youtube.com/playlist?list=PLOOqlFe6t_LZRHhy38ISazMZo99Zq5MZt" target="_blank" class="archive-link">
+              <i class="fa-solid fa-folder-open"></i>
+              Open Automobile Playlist
+            </a>
+          </div>
+        </article>
 
-document.addEventListener('mousemove',e=>{
-  const glow=document.querySelector('.hero-glow');
-  const glow2=document.querySelector('.hero-glow2');
-  if(!glow)return;
-  const rx2=(e.clientX/window.innerWidth-0.5)*30;
-  const ry2=(e.clientY/window.innerHeight-0.5)*30;
-  glow.style.transform=`translate(${rx2}px,${ry2}px)`;
-  if(glow2)glow2.style.transform=`translate(${-rx2*0.5}px,${-ry2*0.5}px)`;
-});
+        <article class="archive-item reveal">
+          <button class="archive-header" onclick="toggleFolder(this)">
+            <div class="archive-info">
+              <span class="archive-index">02</span>
+              <div>
+                <h3 class="archive-title">TV Commercials</h3>
+                <p class="archive-subtitle">Broadcast‑ready TVC cuts</p>
+              </div>
+            </div>
+            <span class="archive-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+          </button>
+          <div class="archive-body">
+            <p class="archive-text">
+              30‑second and 15‑second masters cut for broadcast, with strict duration, clear product beats, and brand‑safe pacing.
+            </p>
+            <a href="https://www.youtube.com/playlist?list=PLOOqlFe6t_LYcDtnbZ6g62_ltwxpEPmWN" target="_blank" class="archive-link">
+              <i class="fa-solid fa-folder-open"></i>
+              Open TVC Playlist
+            </a>
+          </div>
+        </article>
 
-document.querySelectorAll('.btn').forEach(btn=>{
-  btn.addEventListener('click',function(e){
-    const rect=this.getBoundingClientRect();
-    const x=e.clientX-rect.left,y=e.clientY-rect.top;
-    const size=Math.max(rect.width,rect.height)*2;
-    const ripple=document.createElement('span');
-    ripple.className='ripple';
-    ripple.style.cssText=`width:${size}px;height:${size}px;left:${x-size/2}px;top:${y-size/2}px`;
-    this.appendChild(ripple);
-    ripple.addEventListener('animationend',()=>ripple.remove());
-  });
-});
+        <article class="archive-item reveal">
+          <button class="archive-header" onclick="toggleFolder(this)">
+            <div class="archive-info">
+              <span class="archive-index">03</span>
+              <div>
+                <h3 class="archive-title">Food & Beverage</h3>
+                <p class="archive-subtitle">Appetite‑driven commercial edits</p>
+              </div>
+            </div>
+            <span class="archive-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+          </button>
+          <div class="archive-body">
+            <p class="archive-text">
+              Texture‑rich, colour‑driven edits that highlight taste, freshness, and product hero shots for F&B brands.
+            </p>
+            <a href="https://www.youtube.com/playlist?list=PLOOqlFe6t_LbNCHs6_FKGSQnCAKyimWPE" target="_blank" class="archive-link">
+              <i class="fa-solid fa-folder-open"></i>
+              Open F&B Playlist
+            </a>
+          </div>
+        </article>
 
-// featured slider logic
-const track = document.getElementById('featuredTrack');
-const slides = Array.from(document.querySelectorAll('.featured-slide'));
-const prevBtn = document.querySelector('.slider-nav.prev');
-const nextBtn = document.querySelector('.slider-nav.next');
-let activeIndex = 0;
+        <article class="archive-item reveal">
+          <button class="archive-header" onclick="toggleFolder(this)">
+            <div class="archive-info">
+              <span class="archive-index">04</span>
+              <div>
+                <h3 class="archive-title">Fashion</h3>
+                <p class="archive-subtitle">Editorial & campaign films</p>
+              </div>
+            </div>
+            <span class="archive-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+          </button>
+          <div class="archive-body">
+            <p class="archive-text">
+              Editorial‑style fashion films and look‑book campaigns with focus on movement, styling, and visual rhythm.
+            </p>
+            <a href="https://www.youtube.com/playlist?list=PLOOqlFe6t_LbOLOV4QRIPDTmkIcIdJ9Y7" target="_blank" class="archive-link">
+              <i class="fa-solid fa-folder-open"></i>
+              Open Fashion Playlist
+            </a>
+          </div>
+        </article>
 
-function scrollToSlide(index){
-  const clamped=Math.max(0,Math.min(slides.length-1,index));
-  const slide=slides[clamped];
-  activeIndex=clamped;
-  slide.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
-}
-function updateNavDisabled(){
-  if(!prevBtn||!nextBtn)return;
-  prevBtn.disabled=activeIndex===0;
-  nextBtn.disabled=activeIndex===slides.length-1;
-}
-updateNavDisabled();
-if(prevBtn&&nextBtn){
-  prevBtn.addEventListener('click',()=>scrollToSlide(activeIndex-1));
-  nextBtn.addEventListener('click',()=>scrollToSlide(activeIndex+1));
-}
-const obs=new IntersectionObserver(entries=>{
-  let best=null;
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
-      if(!best||entry.intersectionRatio>best.intersectionRatio)best=entry;
-    }
-  });
-  if(best){
-    const active=best.target;
-    slides.forEach(s=>s.classList.remove('is-active'));
-    active.classList.add('is-active');
-    activeIndex=slides.indexOf(active);
-    updateNavDisabled();
-  }
-},{root:track,threshold:[0.5,0.75,0.9]});
-slides.forEach(slide=>obs.observe(slide));
-slides.forEach(slide=>{
-  slide.addEventListener('click',()=>{
-    const id=slide.dataset.videoId;
-    if(id)window.open(`https://www.youtube.com/watch?v=${id}`,'_blank');
-  });
-});
-</script>
+        <article class="archive-item reveal">
+          <button class="archive-header" onclick="toggleFolder(this)">
+            <div class="archive-info">
+              <span class="archive-index">05</span>
+              <div>
+                <h3 class="archive-title">Hero Bike Ads</h3>
+                <p class="archive-subtitle">Automotive campaign series</p>
+              </div>
+            </div>
+            <span class="archive-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+          </button>
+          <div class="archive-body">
+            <p class="archive-text">
+              High‑tempo motorcycle campaigns crafted around energy, motion, and impactful end frames.
+            </p>
+            <a href="https://www.youtube.com/playlist?list=PLOOqlFe6t_LZ4Rb_AcTmziuAOEIibVOh8" target="_blank" class="archive-link">
+              <i class="fa-solid fa-folder-open"></i>
+              Open Hero Playlist
+            </a>
+          </div>
+        </article>
 
+        <article class="archive-item reveal">
+          <button class="archive-header" onclick="toggleFolder(this)">
+            <div class="archive-info">
+              <span class="archive-index">06</span>
+              <div>
+                <h3 class="archive-title">Customer Stories</h3>
+                <p class="archive-subtitle">Narrative‑driven brand films</p>
+              </div>
+            </div>
+            <span class="archive-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+          </button>
+          <div class="archive-body">
+            <p class="archive-text">
+              Real customer and brand stories shaped into honest, emotionally grounded films that drive trust.
+            </p>
+            <a href="https://www.youtube.com/playlist?list=PLOOqlFe6t_LYULEJlgX3-ZhfVxu_biROY" target="_blank" class="archive-link">
+              <i class="fa-solid fa-folder-open"></i>
+              Open Stories Playlist
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="section section-padded">
+      <header class="section-header">
+        <p class="section-eyebrow">Capabilities</p>
+        <h2 class="section-title">Editing <span class="gradient-text">Skillset</span></h2>
+        <p class="section-description">
+          Built for campaigns that need clean structure, emotional timing, and platform‑ready deliveries.
+        </p>
+      </header>
+
+      <div class="skills-grid">
+        <article class="skill-card reveal">
+          <span class="skill-icon"><i class="fa-solid fa-clapperboard"></i></span>
+          <h3>Commercial Editing</h3>
+          <p>Sharp, goal‑oriented edits for TV and digital campaigns.</p>
+        </article>
+        <article class="skill-card reveal">
+          <span class="skill-icon"><i class="fa-solid fa-heart-pulse"></i></span>
+          <h3>Storytelling</h3>
+          <p>Structuring narrative arcs that move people and sell ideas.</p>
+        </article>
+        <article class="skill-card reveal">
+          <span class="skill-icon"><i class="fa-solid fa-droplet"></i></span>
+          <h3>Color Correction</h3>
+          <p>Consistent, clean colour for brand and broadcast delivery.</p>
+        </article>
+        <article class="skill-card reveal">
+          <span class="skill-icon"><i class="fa-solid fa-music"></i></span>
+          <h3>Sound Sync</h3>
+          <p>Dialogue, SFX, and music locked to frame‑accurate timing.</p>
+        </article>
+        <article class="skill-card reveal">
+          <span class="skill-icon"><i class="fa-brands fa-instagram"></i></span>
+          <h3>Social Media Ads</h3>
+          <p>Fast‑paced, hook‑driven edits for feeds and stories.</p>
+        </article>
+        <article class="skill-card reveal">
+          <span class="skill-icon"><i class="fa-solid fa-film"></i></span>
+          <h3>Brand Films</h3>
+          <p>Longer‑form edits for launches, internal, and corporate.</p>
+        </article>
+        <article class="skill-card reveal">
+          <span class="skill-icon"><i class="fa-brands fa-youtube"></i></span>
+          <h3>YouTube & Pre‑Roll Ads</h3>
+          <p>Skippable and non‑skippable ad formats that retain attention.</p>
+        </article>
+        <article class="skill-card reveal">
+          <span class="skill-icon"><i class="fa-solid fa-bolt"></i></span>
+          <h3>Reels & Shorts</h3>
+          <p>Vertical, retention‑optimized edits ready for social distribution.</p>
+        </article>
+        <article class="skill-card reveal">
+          <span class="skill-icon"><i class="fa-solid fa-diagram-project"></i></span>
+          <h3>Campaign Editing</h3>
+          <p>Cutting master campaigns into platform‑specific versions.</p>
+        </article>
+        <article class="skill-card reveal">
+          <span class="skill-icon"><i class="fa-solid fa-handshake-angle"></i></span>
+          <h3>Client Delivery</h3>
+          <p>Clean hand‑off, versions, and delivery according to spec.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section section-padded">
+      <header class="section-header">
+        <p class="section-eyebrow">Behind the Edits</p>
+        <h2 class="section-title">About <span class="gradient-text">Mukesh Chand</span></h2>
+      </header>
+
+      <div class="about-grid">
+        <aside class="about-card reveal">
+          <div class="about-avatar">
+            <span class="about-initials">MC</span>
+          </div>
+          <div class="about-meta">
+            <p class="about-name">Mukesh Chand</p>
+            <p class="about-role">Commercial Video Editor</p>
+            <p class="about-location">Based in India · Working with brands & agencies worldwide</p>
+          </div>
+        </aside>
+
+        <article class="about-copy reveal">
+          <p>
+            I edit for impact — combining pacing, emotional timing, clean structure, and brand clarity to
+            make every campaign feel polished and memorable.
+          </p>
+          <p>
+            Over the last few years I’ve cut pharmaceutical spots, FMCG campaigns, automotive launches,
+            fashion films, and digital‑first brand stories. Every frame is shaped around what the audience
+            should feel, remember, and do after watching.
+          </p>
+          <p>
+            I work well with agencies, production houses, and brand teams that need a reliable editor who
+            understands timelines, feedback cycles, and platform requirements — from broadcast specs to
+            vertical social assets.
+          </p>
+          <p>
+            If you have a campaign that needs sharp, emotionally precise editing, I’d be glad to collaborate.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section section-padded">
+      <header class="section-header">
+        <p class="section-eyebrow">Let’s Collaborate</p>
+        <h2 class="section-title">Have a campaign that needs <span class="gradient-text">sharp editing</span>?</h2>
+        <p class="section-description">
+          Share your brief, timeline, and references — and let’s shape it into a clean, impactful edit.
+        </p>
+      </header>
+
+      <div class="contact-layout">
+        <div class="contact-channels reveal">
+          <h3 class="contact-heading">Direct contact</h3>
+          <p class="contact-intro">
+            Reach out through any of these channels. I usually respond within 24 hours.
+          </p>
+
+          <ul class="contact-list">
+            <li>
+              <a href="mailto:editormukesh2022@gmail.com" class="contact-link">
+                <span class="contact-icon"><i class="fa-solid fa-envelope"></i></span>
+                <div>
+                  <span class="contact-label">Email</span>
+                  <span class="contact-value">editormukesh2022@gmail.com</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="https://wa.me/918447331655" target="_blank" class="contact-link">
+                <span class="contact-icon"><i class="fa-brands fa-whatsapp"></i></span>
+                <div>
+                  <span class="contact-label">WhatsApp</span>
+                  <span class="contact-value">+91 84473 31655</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="https://instagram.com" target="_blank" class="contact-link">
+                <span class="contact-icon"><i class="fa-brands fa-instagram"></i></span>
+                <div>
+                  <span class="contact-label">Instagram</span>
+                  <span class="contact-value">@editormukesh</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.youtube.com/@editormukesh" target="_blank" class="contact-link">
+                <span class="contact-icon"><i class="fa-brands fa-youtube"></i></span>
+                <div>
+                  <span class="contact-label">YouTube</span>
+                  <span class="contact-value">Editing Portfolio Channel</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="contact-form-card reveal">
+          <h3 class="contact-heading">Project details</h3>
+          <form class="contact-form">
+            <div class="form-row">
+              <div class="form-field">
+                <label for="name">Name</label>
+                <input id="name" type="text" placeholder="Your name" />
+              </div>
+              <div class="form-field">
+                <label for="email">Email</label>
+                <input id="email" type="email" placeholder="you@example.com" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label for="projectType">Project Type</label>
+                <select id="projectType">
+                  <option value="">Select project type</option>
+                  <option>TV Commercial</option>
+                  <option>Digital / Social Campaign</option>
+                  <option>Brand Film</option>
+                  <option>Automotive / Launch Film</option>
+                  <option>Short‑form / Reels</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label for="message">Message</label>
+                <textarea id="message" rows="4" placeholder="Share a short brief, timeline, and links (if any)."></textarea>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block" disabled>
+              Send Message (connect backend / form service later)
+            </button>
+            <p class="form-note">
+              This form is visual only right now. Connect it to your preferred form service or backend when ready.
+            </p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button id="backToTop" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <script src="script.js"></script>
 </body>
 </html>
